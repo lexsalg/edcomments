@@ -1,6 +1,10 @@
 # Carpetas
 .idea
 
+# llave privada repo
+keys/private.rsa
+
 # Ejecutables
 edcomments
 edcomments.exe
+routes/comment.go
