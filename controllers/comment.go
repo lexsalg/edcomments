@@ -17,8 +17,10 @@ import (
 func CommentCreate(w http.ResponseWriter, r *http.Request) {
 
 	comment := models.Comment{}
+	user := models.User{}
 	m := models.Message{}
 
+	user, _ = r.Context().Value("user").(models.User)
 	err := json.NewDecoder(r.Body).Decode(&comment)
 
 	if err != nil {
@@ -27,6 +29,7 @@ func CommentCreate(w http.ResponseWriter, r *http.Request) {
 		commons.DisplayMessage(w, m)
 		return
 	}
+	comment.UserID = user.ID
 
 	db := configuration.GetConnection()
 	defer db.Close()
@@ -51,9 +54,9 @@ func CommentGetAll(w http.ResponseWriter, r *http.Request) {
 	comments := []models.Comment{}
 	m := models.Message{}
 	user := models.User{}
-	// vote := models.Vote{}
+	vote := models.Vote{}
 
-	r.Context().Value(&user)
+	user, _ = r.Context().Value("user").(models.User)
 	vars := r.URL.Query()
 
 	db := configuration.GetConnection()
@@ -77,6 +80,25 @@ func CommentGetAll(w http.ResponseWriter, r *http.Request) {
 	}
 
 	cComment.Find(&comments)
+
+	for i := range comments {
+		db.Model(&comments[i]).Related(&comments[i].User)
+		comments[i].User[0].Password = ""
+		comments[i].Children = commentGetChildren(comments[i].ID)
+
+		// se busca el voto del usuario en sesión
+		vote.CommentID = comments[i].ID
+		vote.UserID = user.ID
+		count := db.Where(&vote).Find(&vote).RowsAffected
+		if count > 0 {
+			if vote.Value {
+				comments[i].HasVote = 1
+			} else {
+				comments[i].HasVote = -1
+			}
+		}
+	}
+
 	j, err := json.Marshal(comments)
 	if err != nil {
 		m.Code = http.StatusInternalServerError
@@ -96,4 +118,16 @@ func CommentGetAll(w http.ResponseWriter, r *http.Request) {
 
 	}
 
+}
+
+func commentGetChildren(id uint) (children []models.Comment) {
+	db := configuration.GetConnection()
+	defer db.Close()
+	db.Where("parent_id = ?", id).Find(&children)
+
+	for i := range children {
+		db.Model(&children[i]).Related(&children[i].User)
+		children[i].User[0].Password = ""
+	}
+	return
 }

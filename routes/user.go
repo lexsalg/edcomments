@@ -14,6 +14,7 @@ func SetUserRouter(router *mux.Router) {
 
 	router.PathPrefix(prefix).Handler(
 		negroni.New(
+			// negroni.HandlerFunc(controllers.ValidateToken)
 			negroni.Wrap(subRouter),
 		),
 	)

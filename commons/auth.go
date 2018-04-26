@@ -6,7 +6,7 @@ import (
 	"log"
 	"time"
 
-	"github.com/dgrijalva/jwt-go"
+	jwt "github.com/dgrijalva/jwt-go"
 	"github.com/lexsalg/edcomments/models"
 )
 
@@ -29,11 +29,11 @@ func init() {
 
 	privateKey, err = jwt.ParseRSAPrivateKeyFromPEM(privateBytes)
 	if err != nil {
-		log.Fatal("No se pudo hacer el parse a privateKey")
+		log.Fatal("No se pudo hacer el parse a privateKey", err)
 	}
 	PublicKey, err = jwt.ParseRSAPublicKeyFromPEM(publicBytes)
 	if err != nil {
-		log.Fatal("No se pudo hacer el parse a PublicKey")
+		log.Fatal("No se pudo hacer el parse a PublicKey", err)
 	}
 }
 
@@ -43,10 +43,11 @@ func GenerateJWT(user models.User) string {
 		User: user,
 		StandardClaims: jwt.StandardClaims{
 			ExpiresAt: time.Now().Add(time.Hour * 2).Unix(),
-			Issuer:    "Alexis Salgado",
+			Issuer:    "Noobs Enterprise",
 		},
 	}
-	token := jwt.NewWithClaims(jwt.SigningMethodES256, claims)
+	token := jwt.NewWithClaims(jwt.SigningMethodRS256, claims)
+
 	result, err := token.SignedString(privateKey)
 	if err != nil {
 		log.Fatal("No se pudo firmar el token")

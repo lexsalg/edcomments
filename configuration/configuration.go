@@ -20,7 +20,7 @@ type Configuration struct {
 }
 
 // GetConfiguration obtiene la configuración de BD.
-func GetConfiguration() Configuration {
+func getConfiguration() Configuration {
 
 	var c Configuration
 
@@ -42,7 +42,7 @@ func GetConfiguration() Configuration {
 
 // GetConnection devuelve la conexión a la BD
 func GetConnection() *gorm.DB {
-	c := GetConfiguration()
+	c := getConfiguration()
 	//data source name
 	dsn := fmt.Sprintf("%s:%s@tcp(%s:%s)/%s?charset=utf8&parseTime=true&loc=Local",
 		c.User, c.Password, c.Server, c.Port, c.Database)
