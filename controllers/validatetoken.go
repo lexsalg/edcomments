@@ -12,9 +12,7 @@ import (
 
 // ValidateToken validar el token del cliente
 func ValidateToken(
-	w http.ResponseWriter,
-	r *http.Request,
-	next http.HandlerFunc) {
+	w http.ResponseWriter, r *http.Request, next http.HandlerFunc) {
 	var m models.Message
 	token, err := request.ParseFromRequestWithClaims(
 		r,
