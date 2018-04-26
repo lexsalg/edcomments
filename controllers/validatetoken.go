@@ -5,9 +5,8 @@ import (
 	"net/http"
 
 	jwt "github.com/dgrijalva/jwt-go"
-	"github.com/lexsalg/edcomments/commons"
-
 	"github.com/dgrijalva/jwt-go/request"
+	"github.com/lexsalg/edcomments/commons"
 	"github.com/lexsalg/edcomments/models"
 )
 
